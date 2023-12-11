@@ -1,0 +1,14 @@
+name: devsecops-example
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  unit-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Jest
+        run: npm install && npm install -g jest-cli && npm test
