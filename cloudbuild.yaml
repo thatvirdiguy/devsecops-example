@@ -1,0 +1,36 @@
+steps:
+
+  - id: "build docker image"
+    name: "gcr.io/cloud-builders/docker"
+    timeout: 600s
+    args: 
+      - "build"
+      - "-t"
+      - "gcr.io/$PROJECT_ID/devsecops-example:$SHORT_SHA"
+      - "." 
+
+  - id: "push docker image to GCP Container Registry"
+    name: "gcr.io/cloud-builders/docker"
+    timeout: 600s
+    args: 
+      - "push"
+      - "gcr.io/$PROJECT_ID/devsecops-example:$SHORT_SHA"
+
+  - id: "deploy application on Cloud Run"
+    name: "gcr.io/cloud-builders/gcloud"
+    timeout: 600s
+    args: 
+      - "run"
+      - "deploy"
+      - "ssdlc-example"
+      - "--platform"
+      - "managed"
+      - "--image"
+      - "gcr.io/$PROJECT_ID/devsecops-example:$SHORT_SHA"
+      - "--region"
+      - "europe-west1"
+      - "--memory"
+      - "1Gi"
+      - "--cpu"
+      - "2"
+      - "--allow-unauthenticated"
