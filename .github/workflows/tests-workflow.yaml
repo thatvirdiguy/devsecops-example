@@ -12,3 +12,35 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run Jest
         run: npm install && npm install -g jest-cli && npm test
+
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Polaris CLI
+        uses: carlosperate/download-file-action@v1.0.3
+        with:
+          file-url: ${{ secrets.P_DOWNLOAD_URL }}
+          file-name: polaris_cli-linux64.zip
+      - name: Unzip Polaris CLI
+        run: unzip polaris_cli-linux64.zip -d ./polaris_cli
+      - name: Polaris Full Scan
+        env:
+          POLARIS_ACCESS_TOKEN: ${{ secrets.P_TOKEN }}
+          POLARIS_SERVER_URL: ${{ secrets.P_URL }}
+        run: |
+          export PATH=$PATH:$(pwd)/polaris_cli/$(ls ./polaris_cli)/bin
+          polaris capture
+          polaris analyze -w
+
+  sast:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v2
+      - name: Black Duck Full Scan
+        uses: synopsys-sig/detect-action@v0.3.0
+        with:
+          scan-mode: RAPID
+          detect-version: 8.9.0
+          blackduck-url: ${{ secrets.BD_URL }}
+          blackduck-api-token: ${{ secrets.BD_TOKEN }}
