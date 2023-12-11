@@ -32,7 +32,7 @@ jobs:
           polaris capture
           polaris analyze -w
 
-  sast:
+  sca:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
